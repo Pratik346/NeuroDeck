@@ -16,5 +16,5 @@ app.use("/api/interview", require("./routes/interviewRoutes"));
 app.get("/",(req,res)=>{
     res.send("FlashCard Server started")
 });
-const port=process.env.port || 5000;
-app.listen(port,()=>console.log(`Server running on port ${port}`));
+const PORT=process.env.PORT || 5000;
+app.listen(port,()=>console.log(`Server running on port ${PORT}`));
