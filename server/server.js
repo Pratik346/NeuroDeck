@@ -17,4 +17,4 @@ app.get("/",(req,res)=>{
     res.send("FlashCard Server started")
 });
 const PORT=process.env.PORT || 5000;
-app.listen(port,()=>console.log(`Server running on port ${PORT}`));
+app.listen(PORT,()=>console.log(`Server running on port ${PORT}`));
