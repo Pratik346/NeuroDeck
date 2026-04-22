@@ -20,6 +20,7 @@ const StudyMode = () => {
 
   const [xpGained, setXpGained] = useState(0);
   const [totalXP, setTotalXP] = useState(0);
+  const [totalCards, setTotalCards] = useState(0);
 
   useEffect(() => {
     fetchData();
@@ -47,18 +48,14 @@ const StudyMode = () => {
 
   const fetchData = async () => {
     try {
-      const [deckData, cardsData] = await Promise.all([
+      const [deckData, response] = await Promise.all([
         deckService.getDeckById(deckId),
         cardService.getCardsByDeck(deckId),
       ]);
 
       setDeck(deckData);
-
-      const sorted = cardsData.sort(
-        (a, b) => new Date(a.nextReview) - new Date(b.nextReview)
-      );
-
-      setCards(sorted);
+      setCards(response.dueCards);
+      setTotalCards(response.totalCards);
     } catch (err) {
       console.error(err);
     } finally {
@@ -89,28 +86,49 @@ const StudyMode = () => {
 
   if (loading) return <p style={styles.center}>Loading...</p>;
 
-  if (cards.length === 0) {
-    return (
-      <div style={styles.emptyContainer}>
-        <div style={styles.emptyCard}>
-          
-          <h2 style={styles.emptyTitle}>No Cards Available 📭</h2>
-  
-          <p style={styles.emptyText}>
-            This deck is empty. Start adding cards to begin studying.
-          </p>
-  
-          <button
-            style={styles.emptyBtn}
-            onClick={() => navigate(`/upload/${deckId}`)}
-          >
-            + Add Cards
-          </button>
-  
-        </div>
+// Case 1: Deck is truly empty
+if (totalCards === 0) {
+  return (
+    <div style={styles.emptyContainer}>
+      <div style={styles.emptyCard}>
+        <h2 style={styles.emptyTitle}>No Cards Yet 📭</h2>
+
+        <p style={styles.emptyText}>
+          This deck is empty. Add cards to start learning.
+        </p>
+
+        <button
+          style={styles.emptyBtn}
+          onClick={() => navigate(`/upload/${deckId}`)}
+        >
+          + Add Cards
+        </button>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+// Case 2: No cards due
+if (cards.length === 0) {
+  return (
+    <div style={styles.emptyContainer}>
+      <div style={styles.emptyCard}>
+        <h2 style={styles.emptyTitle}>You're Done for Today 🎉</h2>
+
+        <p style={styles.emptyText}>
+          No cards are due right now. Come back later.
+        </p>
+
+        <button
+          style={styles.emptyBtn}
+          onClick={() => navigate("/dashboard")}
+        >
+          Back to Dashboard
+        </button>
+      </div>
+    </div>
+  );
+}
 
   if (sessionComplete) {
     return (

@@ -79,12 +79,21 @@ const generateCards = async (req, res) => {
 };
 const getCardsByDeck = async (req, res) => {
   try {
-    const cards = await Card.find({
+    const now = new Date();
+    const totalCards = await Card.countDocuments({
       deck: req.params.deckId,
       user: req.user._id,
     });
+    const dueCards = await Card.find({
+      deck: req.params.deckId,
+      user: req.user._id,
+      nextReview: { $lte: now },
+    }).sort({ nextReview: 1 });
+    res.json({
+      totalCards,
+      dueCards,
+    });
 
-    res.json(cards);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
