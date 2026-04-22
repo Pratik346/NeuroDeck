@@ -30,13 +30,13 @@ const UploadPage = () => {
     try {
       setFetching(true);
 
-      const [deckData, cardsData] = await Promise.all([
+      const [deckData, response] = await Promise.all([
         deckService.getDeckById(deckId),
         cardService.getCardsByDeck(deckId),
       ]);
 
       setDeck(deckData);
-      setCards(cardsData);
+      setCards(response.dueCards || []);
     } catch {
       setError("Failed to load deck");
     } finally {
